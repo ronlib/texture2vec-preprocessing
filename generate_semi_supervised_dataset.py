@@ -41,7 +41,7 @@ def main():
     parser = argparse.ArgumentParser(description='Semi supervised generator')
     parser.add_argument('-d', '--directory', required=True, dest='input_image_directory',
                         help='input image directory')
-    parser.add_argument('-s', '--segments', required=True, dest=seg_est_path,
+    parser.add_argument('-s', '--segments', required=True, dest='seg_est_path',
                         help='Segmentation estimates path')
 
     args = parser.parse_args()
