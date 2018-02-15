@@ -16,6 +16,7 @@ import shutil
 import errno
 import glob
 import math
+import argparse
 import random
 import itertools
 import numpy as np
@@ -37,9 +38,18 @@ also_split_source_data_to_types = 0
 
 def main():
 
-    base_path = '/home/ron/Downloads/BSDS500-master/BSDS500/data'
+    parser = argparse.ArgumentParser(description='Semi supervised generator')
+    parser.add_argument('-d', '--directory', required=True, dest='input_image_directory',
+                        help='input image directory')
+    parser.add_argument('-s', '--segments', required=True, dest=seg_est_path,
+                        help='Segmentation estimates path')
+
+    args = parser.parse_args()
+
+    base_path = args.input_image_directory
     dataset_types = ['train', 'val', 'test']
-    seg_est_path = '/home/ron/Downloads/BSDS500-master/BSDS500/data/groundTruth'
+    # seg_est_path = '/home/ron/Downloads/BSDS500-master/BSDS500/data/groundTruth'
+    seg_est_path = args.seg_est_path
 
     if also_split_source_data_to_types:
 
