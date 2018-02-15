@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import argparse
 from collections import Counter
 
 MIN_FILES_IN_DIR = 8
@@ -33,9 +34,16 @@ def remove_too_few_segs(data_dir):
 
 def main():
 
+    parser = argparse.ArgumentParser(description='Remove unnecessary files')
+    parser.add_argument('-d', '--directory', required=True, dest='images_directory',
+                        help='input image directory')
+
+    args = parser.parse_args()
+
+
     dataset_types = ['train', 'val', 'test']
     for i in xrange(0,len(dataset_types)):
-        base_data_dir = "/home/ron/Downloads/BSDS500-master/BSDS500/data/patches2_32_32"
+        base_data_dir = args.images_directory
         data_dir = os.path.join(base_data_dir, dataset_types[i])
 
         # Remove directories with few files
