@@ -29,7 +29,7 @@ from scipy.misc import imresize
 number_of_clusters = 6
 patches_per_cluster_per_axis = 3 #without overlep
 patch_size = [32, 32] #When changing patchs size need to change this
-folder_name = 'patches2_32_32' #When changing patchs size need to change this
+folder_name = 'patches_16_16' #When changing patchs size need to change this
 stride_size = patch_size[0]/4
 distance_between_clusters = 3 #in patches units
 max_tries = 1000
@@ -43,6 +43,10 @@ def main():
                         help='input image directory')
     parser.add_argument('-s', '--segments', required=True, dest='seg_est_path',
                         help='Segmentation estimates path')
+    parser.add_argument('-o', '--output-patches-directory', required=False,
+                        dest='output_patches_directory',
+                        help='Directory name of the output patches',
+                        default="patches")
 
     args = parser.parse_args()
 
@@ -50,6 +54,7 @@ def main():
     dataset_types = ['train', 'val', 'test']
     # seg_est_path = '/home/ron/Downloads/BSDS500-master/BSDS500/data/groundTruth'
     seg_est_path = args.seg_est_path
+    folder_name = args.output_patches_directory
 
     if also_split_source_data_to_types:
 
