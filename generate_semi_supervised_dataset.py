@@ -28,10 +28,7 @@ from scipy.misc import imresize
 
 number_of_clusters = 6
 patches_per_cluster_per_axis = 3 #without overlep
-folder_name = 'patches_16_16' #When changing patchs size need to change this
 distance_between_clusters = 3 #in patches units
-max_tries = 1000
-patches_per_image = 1000
 also_split_source_data_to_types = 0
 
 def main():
@@ -47,6 +44,10 @@ def main():
                         dest='output_patches_directory',
                         help='Directory name of the output patches',
                         default="patches")
+    parser.add_argument('-n', '--number_of_image_patches', required=True,
+                        dest='patches_per_image',
+                        help='The number of patches extracted from each image',
+                        default=50000, type=int)
 
     args = parser.parse_args()
 
@@ -69,17 +70,17 @@ def main():
 
         for i in xrange(0,len(dataset_types)):
             img_output_dir = os.path.join(target_img_path, dataset_types[i])
-            patchs_output_dir = os.path.join(base_path, folder_name, dataset_types[i])
+            patches_output_dir = os.path.join(base_path, folder_name, dataset_types[i])
             try:
                 shutil.rmtree(img_output_dir)
             except OSError as exception:
                 print(exception)
             try:
-                shutil.rmtree(patchs_output_dir)
+                shutil.rmtree(patches_output_dir)
             except OSError as exception:
                 print(exception)
             makedirs_if_needed(img_output_dir)
-            makedirs_if_needed(patchs_output_dir)
+            makedirs_if_needed(patches_output_dir)
             for j in xrange(dataset_types_idx[i][0],dataset_types_idx[i][1]):
                 img_filename = img_list[j]
                 print('Processing ' + img_filename)
@@ -96,17 +97,19 @@ def main():
                 if os.path.isfile(seg_est_filename):
                     d = sio.loadmat(seg_est_filename)
                     current_segmentation_est = d[0][0][0]
-                    GeneratePatches(patchs_output_dir, current_img, current_segmentation_est, patch_size, base_filename)
+                    GeneratePatches(patches_output_dir, current_img, current_segmentation_est, patch_size, base_filename)
     else:
         for i in xrange(0,len(dataset_types)):
             dataset_type = dataset_types[i]
             source_img_path = os.path.join(base_path, 'images', dataset_type)
-            patchs_output_dir = os.path.join(base_path, folder_name, dataset_type)
+            print('Source image path: %s' % (source_img_path, ))
+            patches_output_dir = os.path.join(base_path, folder_name, dataset_type)
+            print('Patches output dir: %s' % (patches_output_dir,))
             try:
-                shutil.rmtree(patchs_output_dir)
+                shutil.rmtree(patches_output_dir)
             except OSError as exception:
                 print(exception)
-            makedirs_if_needed(patchs_output_dir)
+            makedirs_if_needed(patches_output_dir)
             img_list = glob.glob(os.path.join(source_img_path, '*.jpg'))
             for img_filename in img_list:
                 print('Processing ' + img_filename)
@@ -122,13 +125,12 @@ def main():
                 if os.path.isfile(seg_est_filename):
                     d = sio.loadmat(seg_est_filename)
                     current_segmentation_est = d['groundTruth'][0][0][0][0][0]
-                    GeneratePatches(patchs_output_dir, current_img, current_segmentation_est, patch_size, base_filename)
+                    GeneratePatches(patches_output_dir, current_img, current_segmentation_est, patch_size, base_filename, args.patches_per_image)
 
 
 
 
-
-def GeneratePatches(output_dir, img, img_segs_est, patch_size, name_prefix):
+def GeneratePatches(output_dir, img, img_segs_est, patch_size, name_prefix, patches_per_image):
 
     # we pad with zeros, so that patches can be obtained from all areas (including near the image boundary)
     pad_size = [(x + 1) / 2 for x in patch_size]
